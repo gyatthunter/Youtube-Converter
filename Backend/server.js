@@ -46,7 +46,6 @@ app.get("/download", async (req, res) => {
         progressTracker[jobId] = { progress: 0, status: 'starting' };
     }
 
-    // Fetch the title first
     let title = `audio_${Date.now()}`;
     try {
         const titleOutput = await new Promise((resolve, reject) => {
@@ -61,7 +60,6 @@ app.get("/download", async (req, res) => {
             });
         });
         if (titleOutput) {
-            // Remove characters that might mess up file systems or headers
             title = titleOutput.replace(/[^\w\s-]/gi, '').trim(); 
         }
     } catch(e) {

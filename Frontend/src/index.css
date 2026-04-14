@@ -583,7 +583,6 @@ body.mando-theme .lightsaber-underline.ignited .blade {
   clip-path: polygon(0 0, 60% 0, 100% 50%, 60% 100%, 0 100%);
 }
 
-/* The Blade */
 .blade {
   height: 7px;
   width: 0;
@@ -733,7 +732,6 @@ body.mando-theme .lightsaber-underline.ignited .blade {
   }
 }
 
-/* Download Button */
 .download-btn {
   margin-top: 40px;
   padding: 12px 40px;
@@ -798,7 +796,6 @@ body.mando-theme .lightsaber-underline.ignited .blade {
   to { box-shadow: 0 0 30px var(--sith-red); text-shadow: 0 0 15px white; color: white; }
 }
 
-/* Progress Bar */
 .progress-wrapper {
   width: 100%;
   margin-top: 20px;
