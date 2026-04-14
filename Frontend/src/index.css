@@ -1,0 +1,843 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&display=swap');
+@import url('https://fonts.cdnfonts.com/css/aurebesh');
+
+:root {
+  --sith-red: #ff0000;
+  --sith-red-glow: rgba(255, 0, 0, 0.6);
+  --sith-red-dim: rgba(255, 0, 0, 0.2);
+  --obsidian: #050505;
+  --imperial-gray: #1a1a1a;
+  --text-primary: #e0e0e0;
+  --font-display: 'Orbitron', sans-serif;
+  --font-text: 'Rajdhani', sans-serif;
+  --neon-gold: #FFD700;
+  --neon-gold-glow: rgba(255, 215, 0, 0.6);
+  --neon-gold-dim: rgba(255, 215, 0, 0.2);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--obsidian);
+  color: var(--text-primary);
+  font-family: var(--font-text);
+  min-height: 100vh;
+  overflow-x: hidden;
+  transition: background-image 0.5s ease;
+}
+
+body.sith-theme {
+  background-image: radial-gradient(circle at top, #150000 0%, var(--obsidian) 80%);
+}
+
+body.jedi-theme {
+  background-image: radial-gradient(circle at top, #001020 0%, var(--obsidian) 80%);
+  --sith-red: #00d4ff;
+  --sith-red-glow: rgba(0, 212, 255, 0.6);
+  --sith-red-dim: rgba(0, 212, 255, 0.2);
+}
+
+body.jedi-theme .runes-header {
+  color: #aae5ff;
+  text-shadow: 0 0 10px var(--sith-red-glow), 0 0 20px var(--sith-red), 0 0 30px #0055aa;
+}
+
+body.jedi-theme .ambient-glow {
+  background: radial-gradient(circle, rgba(0, 212, 255, 0.1) 0%, transparent 60%);
+}
+
+body.jedi-theme .ambient-glow {
+  background: radial-gradient(circle, rgba(0, 212, 255, 0.1) 0%, transparent 60%);
+}
+
+body.yoda-theme {
+  background-image: radial-gradient(circle at top, #001500 0%, var(--obsidian) 80%);
+  --sith-red: #39ff14;
+  --sith-red-glow: rgba(57, 255, 20, 0.6);
+  --sith-red-dim: rgba(57, 255, 20, 0.2);
+}
+
+body.yoda-theme .runes-header {
+  color: #aaffaa;
+  text-shadow: 0 0 10px var(--sith-red-glow), 0 0 20px var(--sith-red), 0 0 30px #008800;
+}
+
+body.yoda-theme .ambient-glow {
+  background: radial-gradient(circle, rgba(57, 255, 20, 0.1) 0%, transparent 60%);
+}
+
+body.yoda-theme .ambient-glow {
+  background: radial-gradient(circle, rgba(57, 255, 20, 0.1) 0%, transparent 60%);
+}
+
+body.mando-theme {
+  background-image: radial-gradient(circle at top, #1a1c20 0%, var(--obsidian) 80%);
+  --sith-red: #ffffff;
+  --sith-red-glow: rgba(255, 255, 255, 0.5);
+  --sith-red-dim: rgba(255, 255, 255, 0.15);
+}
+
+body.mando-theme .runes-header {
+  color: #eeeeee;
+  text-shadow: 0 0 10px var(--sith-red-glow), 0 0 20px var(--sith-red), 0 0 30px #aaaaaa;
+}
+
+body.mando-theme .ambient-glow {
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, transparent 60%);
+}
+
+body.mando-theme .ambient-glow {
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, transparent 60%);
+}
+
+body.mando-theme .blade {
+  background: #000;
+  border: 1px solid #fff;
+  border-left: none;
+  border-radius: 0 6px 0 0;
+  height: 7px;
+}
+
+body.mando-theme .lightsaber-underline.ignited .blade {
+  box-shadow:
+    0 0 5px #fff,
+    0 0 15px rgba(255, 255, 255, 0.8),
+    0 0 30px rgba(255, 255, 255, 0.5),
+    inset 0 0 4px #fff;
+}
+
+.interactive-rune {
+  cursor: pointer;
+  transition: transform 0.2s, text-shadow 0.2s;
+  position: relative;
+  z-index: 10;
+}
+
+.interactive-rune:hover {
+  transform: scale(1.1);
+  text-shadow: 0 0 20px #fff;
+}
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  position: relative;
+}
+
+.scanlines {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(to bottom,
+      rgba(0, 0, 0, 0),
+      rgba(0, 0, 0, 0) 50%,
+      rgba(0, 0, 0, 0.15) 50%,
+      rgba(0, 0, 0, 0.15));
+  background-size: 100% 4px;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.8;
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 40px 50px;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+@keyframes hoveringRune {
+  0% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-8px);
+  }
+
+  100% {
+    transform: translateY(0);
+  }
+}
+
+.runes-header {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  gap: 15vw;
+  font-family: 'Aurebesh', sans-serif;
+  font-size: 40px;
+  color: #ff1111;
+  /* deeper neon blood red */
+  text-shadow: 0 0 10px var(--sith-red-glow), 0 0 20px var(--sith-red), 0 0 30px #aa0000;
+  letter-spacing: 5px;
+  animation: hoveringRune 4s ease-in-out infinite;
+}
+
+.navbar-logo {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 900;
+  color: var(--sith-red);
+  letter-spacing: 2px;
+  text-shadow: 0 0 10px var(--sith-red-glow);
+}
+
+.navbar-logo .navbar-subtext {
+  font-size: 14px;
+  color: #666;
+  vertical-align: middle;
+  text-shadow: none;
+}
+
+.navbar-links {
+  display: flex;
+  gap: 30px;
+}
+
+.navbar-links a {
+  color: var(--text-primary);
+  text-decoration: none;
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  transition: 0.3s ease;
+  padding: 5px 0;
+  position: relative;
+}
+
+.navbar-links a::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: 0;
+  left: 0;
+  background-color: var(--sith-red);
+  transition: width 0.3s ease;
+  box-shadow: 0 0 5px var(--sith-red);
+}
+
+.navbar-links a:hover::after {
+  width: 100%;
+}
+
+.navbar-links a:hover {
+  color: var(--sith-red);
+  text-shadow: 0 0 10px var(--sith-red-glow);
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 20px;
+  position: relative;
+}
+
+.ambient-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 50vw;
+  height: 50vh;
+  background: radial-gradient(circle, rgba(255, 0, 0, 0.1) 0%, transparent 60%);
+  filter: blur(60px);
+  z-index: -1;
+  pointer-events: none;
+}
+
+.hero {
+  width: 100%;
+}
+
+.hero-content {
+  text-align: center;
+  max-width: 600px;
+  width: 100%;
+  margin: 0 auto;
+  z-index: 2;
+}
+
+.system-status {
+  font-family: var(--font-display);
+  color: var(--sith-red);
+  font-size: 12px;
+  letter-spacing: 4px;
+  margin-bottom: 15px;
+  text-shadow: 0 0 5px rgba(255, 0, 0, 0.4);
+}
+
+.hero-title {
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 8vw, 5rem);
+  font-weight: 900;
+  text-transform: uppercase;
+  color: #fff;
+  margin-bottom: 15px;
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+  letter-spacing: 2px;
+}
+
+
+.search-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.input-wrapper {
+  position: relative;
+  width: 100%;
+  flex: 1;
+}
+
+.sith-input {
+  display: block;
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+  background: transparent;
+  border: none;
+  color: white;
+  font-family: var(--font-display);
+  font-size: clamp(14px, 4vw, 20px);
+  padding: 10px 20px 10px 10px;
+  outline: none;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  transition: all 0.5s ease;
+}
+
+.sith-input.hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(15px);
+  color: transparent !important;
+}
+
+.sith-input.hidden::placeholder {
+  color: transparent !important;
+  text-shadow: none !important;
+}
+
+.sith-input.visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.sith-input::placeholder {
+  color: black;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
+  transition: all 0.4s ease;
+  font-size: clamp(12px, 3vw, 16px);
+}
+
+.sith-input:hover::placeholder {
+  color: black;
+  text-shadow: 0 0 15px var(--sith-red);
+  letter-spacing: 3px;
+}
+
+.sith-input:focus::placeholder {
+  color: transparent;
+  text-shadow: none;
+}
+
+.sith-input:focus {
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+/* Lightsaber Underline Effect */
+.lightsaber-underline {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 12px;
+  margin-top: -2px;
+  filter: drop-shadow(0 5px 5px rgba(0, 0, 0, 0.8));
+}
+
+/* Custom Hilts shared base */
+.custom-hilt {
+  display: flex;
+  height: 100%;
+  position: relative;
+  z-index: 2;
+  flex-shrink: 0;
+  box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.8);
+  margin-left: 50%;
+  transform: translateX(-50%);
+  transition: margin-left 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+    transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.lightsaber-underline.ignited .custom-hilt {
+  margin-left: 0;
+  transform: translateX(0);
+}
+
+/* 1. Vader Hilt */
+.hilt-vader {
+  width: 60px;
+  background: linear-gradient(to bottom, #555 0%, #aaa 20%, #777 50%, #333 80%, #111 100%);
+  border-radius: 3px 0 0 3px;
+  border: 1px solid #111;
+}
+
+.vader-pommel {
+  width: 9px;
+  height: 100%;
+  background: linear-gradient(to bottom, #222, #000);
+  border-right: 1px solid #000;
+  border-radius: 2px 0 0 2px;
+}
+
+.vader-grip {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  background: #333;
+}
+
+.vader-ridge {
+  width: 4px;
+  height: 100%;
+  background: #111;
+  box-shadow: 1px 0 1px rgba(255, 255, 255, 0.2);
+}
+
+.vader-shroud {
+  width: 10px;
+  height: 100%;
+  background: #000;
+  clip-path: polygon(0 0, 100% 0, 50% 100%, 0 100%);
+}
+
+.vader-emitter {
+  width: 7px;
+  height: 80%;
+  margin-top: auto;
+  margin-bottom: auto;
+  background: linear-gradient(to right, #444, #777, #222);
+  border-radius: 0 3px 3px 0;
+}
+
+/* 2. Anakin Hilt */
+.hilt-anakin {
+  width: 60px;
+  height: 7px;
+  background: linear-gradient(to bottom, #ccc, #fff, #999, #555);
+  border-radius: 2px 0 0 2px;
+  border: 1px solid #444;
+}
+
+.anakin-pommel {
+  width: 7px;
+  height: 100%;
+  background: #111;
+  border-radius: 2px 0 0 2px;
+}
+
+.anakin-grip {
+  flex: 1;
+  background: repeating-linear-gradient(90deg,
+      #111,
+      #111 2px,
+      #333 2px,
+      #333 4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.anakin-control-box {
+  width: 12px;
+  height: 100%;
+  background: #b89947;
+  border-left: 1px solid #222;
+  border-right: 1px solid #222;
+}
+
+.anakin-button,
+.anakin-button-gold {
+  display: none;
+}
+
+.anakin-emitter {
+  width: 10px;
+  height: 100%;
+  background: #111;
+  border-radius: 0 2px 2px 0;
+  display: flex;
+  align-items: center;
+}
+
+.anakin-shroud {
+  width: 8px;
+  height: 100%;
+  background: #ccc;
+  clip-path: polygon(0 15%, 100% 0, 100% 100%, 0 85%);
+  margin-left: 1px;
+}
+
+/* 3. Yoda Hilt */
+.hilt-yoda {
+  width: 45px;
+  height: 7px;
+  background: linear-gradient(to bottom, #ccc, #fff, #999, #555);
+  border-radius: 2px 0 0 2px;
+  border: 1px solid #444;
+}
+
+.yoda-pommel {
+  width: 6px;
+  height: 100%;
+  background: #111;
+  border-radius: 2px 0 0 2px;
+}
+
+.yoda-grip {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  background: #222;
+}
+
+.yoda-ridge {
+  width: 6px;
+  height: 100%;
+  background: linear-gradient(to right, #111, #444, #111);
+}
+
+.yoda-emitter {
+  width: 6px;
+  height: 100%;
+  background: #000;
+  border-radius: 0 2px 2px 0;
+  border-left: 2px solid #666;
+}
+
+/* 4. Darksaber Hilt */
+.hilt-darksaber {
+  width: 55px;
+  height: 7px;
+  background: linear-gradient(to bottom, #333, #555, #222);
+  border-radius: 0;
+  border: 1px solid #111;
+}
+
+.darksaber-pommel {
+  width: 6px;
+  height: 100%;
+  background: #050505;
+  clip-path: polygon(0 20%, 100% 0, 100% 100%, 0 80%);
+}
+
+.darksaber-grip {
+  flex: 1;
+  background: repeating-linear-gradient(90deg,
+      #111,
+      #111 2px,
+      #222 2px,
+      #222 4px);
+}
+
+.darksaber-guard {
+  width: 9px;
+  height: 180%;
+  align-self: center;
+  background: linear-gradient(to bottom, #222, #444, #111);
+  clip-path: polygon(0 0, 100% 20%, 100% 80%, 0 100%);
+  margin-left: 1px;
+}
+
+.darksaber-emitter {
+  width: 10px;
+  height: 100%;
+  background: #111;
+  clip-path: polygon(0 0, 60% 0, 100% 50%, 60% 100%, 0 100%);
+}
+
+/* The Blade */
+.blade {
+  height: 7px;
+  width: 0;
+  background: #fff;
+  margin-left: -4px;
+  border-radius: 0 7px 7px 0;
+  transition: width 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
+  box-shadow:
+    0 0 0 transparent,
+    0 0 0 transparent,
+    0 0 0 transparent;
+  z-index: 1;
+  transform-origin: left center;
+}
+
+@keyframes unstableGlow {
+
+  0%,
+  100% {
+    opacity: 1;
+    transform: scaleY(1);
+    filter: brightness(1);
+  }
+
+  20% {
+    opacity: 0.85;
+    transform: scaleY(0.85);
+    filter: brightness(1.3);
+  }
+
+  40% {
+    opacity: 1;
+    transform: scaleY(1.15);
+    filter: brightness(1.1);
+  }
+
+  60% {
+    opacity: 0.9;
+    transform: scaleY(0.9);
+    filter: brightness(1.4);
+  }
+
+  80% {
+    opacity: 1;
+    transform: scaleY(1.2);
+    filter: brightness(0.85);
+  }
+}
+
+.lightsaber-underline.ignited .blade {
+  width: 100%;
+  box-shadow:
+    0 0 8px #fff,
+    0 0 20px var(--sith-red),
+    0 0 40px var(--sith-red),
+    0 0 60px var(--sith-red),
+    0 0 100px var(--sith-red);
+  animation: unstableGlow 0.1s infinite;
+}
+
+.footer {
+  text-align: center;
+  padding: 40px;
+  font-family: var(--font-display);
+  font-size: 12px;
+  color: var(--sith-red-dim);
+  border-top: 1px solid rgba(255, 0, 0, 0.05);
+  letter-spacing: 4px;
+  z-index: 2;
+}
+
+/* Particles */
+.particles-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.ember {
+  position: absolute;
+  bottom: -20px;
+  width: 4px;
+  height: 4px;
+  background: var(--sith-red);
+  border-radius: 50%;
+  box-shadow: 0 0 10px var(--sith-red), 0 0 20px var(--sith-red);
+  animation: floatEmber 6s infinite ease-in;
+  opacity: 0;
+}
+
+.ember-1 {
+  left: 20%;
+  animation-duration: 8s;
+  animation-delay: 1s;
+}
+
+.ember-2 {
+  left: 40%;
+  animation-duration: 5s;
+  animation-delay: 3s;
+}
+
+.ember-3 {
+  left: 60%;
+  animation-duration: 7s;
+  animation-delay: 2s;
+}
+
+.ember-4 {
+  left: 80%;
+  animation-duration: 6s;
+  animation-delay: 5s;
+}
+
+.ember-5 {
+  left: 50%;
+  animation-duration: 9s;
+  animation-delay: 0s;
+}
+
+@keyframes floatEmber {
+  0% {
+    transform: translateY(0) translateX(0) scale(1);
+    opacity: 0;
+  }
+
+  20% {
+    opacity: 0.8;
+  }
+
+  50% {
+    transform: translateY(-30vh) translateX(20px) scale(1.5);
+  }
+
+  80% {
+    opacity: 0.4;
+  }
+
+  100% {
+    transform: translateY(-60vh) translateX(-20px) scale(0.5);
+    opacity: 0;
+  }
+}
+
+/* Download Button */
+.download-btn {
+  margin-top: 40px;
+  padding: 12px 40px;
+  background: transparent;
+  border: 1px solid var(--sith-red);
+  color: var(--text-primary);
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  cursor: pointer;
+  
+  opacity: 0;
+  transform: translateY(20px);
+  pointer-events: none;
+  
+  transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 0 10px rgba(0,0,0,0.3), inset 0 0 5px var(--sith-red-dim);
+  position: relative;
+  overflow: hidden;
+}
+
+.download-btn::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: var(--sith-red);
+  opacity: 0;
+  z-index: -1;
+  transition: opacity 0.3s ease;
+}
+
+.download-btn.visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.download-btn:hover {
+  box-shadow: 0 0 20px var(--sith-red), inset 0 0 10px var(--sith-red);
+  color: #fff;
+  text-shadow: 0 0 8px #fff;
+}
+
+.download-btn:hover::before {
+  opacity: 0.15;
+}
+
+.download-btn:active {
+  transform: scale(0.95);
+}
+
+.download-btn.pulse {
+  animation: pulseButton 1s infinite alternate;
+  pointer-events: none;
+  opacity: 0.8;
+}
+
+@keyframes pulseButton {
+  from { box-shadow: 0 0 10px var(--sith-red); text-shadow: 0 0 5px var(--sith-red); color: white; }
+  to { box-shadow: 0 0 30px var(--sith-red); text-shadow: 0 0 15px white; color: white; }
+}
+
+/* Progress Bar */
+.progress-wrapper {
+  width: 100%;
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  opacity: 0;
+  transform: translateY(-10px);
+  pointer-events: none;
+  transition: all 0.5s ease;
+}
+
+.progress-wrapper.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.progress-container {
+  width: 100%;
+  height: 6px;
+  background-color: var(--sith-red-dim);
+  border-radius: 3px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: inset 0 0 5px rgba(0,0,0,0.8);
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background-color: var(--sith-red);
+  box-shadow: 0 0 10px var(--sith-red), 0 0 20px var(--sith-red-glow);
+  transition: width 0.3s ease;
+}
+
+.progress-text {
+  margin-top: 8px;
+  font-family: var(--font-display);
+  font-size: 12px;
+  color: var(--sith-red);
+  letter-spacing: 2px;
+  text-shadow: 0 0 5px var(--sith-red-glow);
+}
