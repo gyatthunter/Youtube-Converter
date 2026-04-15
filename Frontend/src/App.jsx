@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './index.css';
 
+const API_BASE = import.meta.env.VITE_API_URL || '/api';
+
 const Navbar = ({ setTheme }) => (
   <nav className="navbar runes-navbar">
     <div className="runes-header">
@@ -56,6 +58,7 @@ const DarksaberHilt = () => (
     <div className="darksaber-emitter"></div>
   </div>
 );
+
 const LightsaberInput = ({ theme, query, setQuery }) => {
   const [isFocused, setIsFocused] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
@@ -63,73 +66,60 @@ const LightsaberInput = ({ theme, query, setQuery }) => {
   const [downloadStatus, setDownloadStatus] = useState("");
   const inputRef = useRef(null);
 
-  const handleDownload = async (e) => {
-    e.preventDefault();
-
-    if (!query) {
-      alert("Enter a link");
-      return;
-    }
+  const handleDownload = async () => {
+    if (!query) { alert("Enter a link"); return; }
 
     setIsDownloading(true);
     setProgress(0);
     setDownloadStatus("STARTING...");
 
-    const jobId = Date.now().toString();
+    // Step 1: Start conversion
+    const startRes = await fetch(`${API_BASE}/convert?url=${encodeURIComponent(query)}`);
+    if (!startRes.ok) {
+      alert("Failed to start conversion");
+      setIsDownloading(false);
+      return;
+    }
+    const { jobId } = await startRes.json();
+    setDownloadStatus("CONVERTING...");
 
-    const interval = setInterval(async () => {
-      try {
-        const res = await fetch(`http://localhost:3000/progress?jobId=${jobId}`);
-        const data = await res.json();
-        if (data.status === 'downloading' || data.status === 'converting') {
-           setProgress(data.progress || 0);
-           setDownloadStatus(data.status === 'converting' ? "CONVERTING..." : "DOWNLOADING...");
-        } else if (data.status === 'completed') {
-           setProgress(100);
-           setDownloadStatus("COMPLETED");
-        }
-      } catch (e) {
-        console.error(e);
-      }
-    }, 500);
-
+    // Step 2: Poll progress
     try {
-      const response = await fetch(`http://localhost:3000/download?url=${encodeURIComponent(query)}&jobId=${jobId}`);
-      
-      if (!response.ok) {
-        throw new Error("Download failed");
-      }
+      await new Promise((resolve, reject) => {
+        const interval = setInterval(async () => {
+          const pres = await fetch(`${API_BASE}/progress?jobId=${jobId}`);
+          const data = await pres.json();
+          setProgress(data.progress || 0);
+          if (data.status === 'downloading') setDownloadStatus("DOWNLOADING...");
+          else if (data.status === 'converting') setDownloadStatus("CONVERTING...");
 
-      const blob = await response.blob();
-      const downloadUrl = window.URL.createObjectURL(blob);
-      
-      const link = document.createElement('a');
-      link.href = downloadUrl;
-
-      let filename = `audio_${Date.now()}.mp3`;
-      const contentDisposition = response.headers.get("Content-Disposition");
-      if (contentDisposition && contentDisposition.includes("filename=")) {
-        const match = contentDisposition.match(/filename="?([^"]+)"?/);
-        if (match) {
-            filename = match[1];
-        }
-      }
-      link.download = filename;
-      
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      
-      window.URL.revokeObjectURL(downloadUrl);
-    } catch (error) {
-      console.error("Download error:", error);
-      alert("An error occurred during download.");
-    } finally {
-      clearInterval(interval);
+          if (data.status === 'completed') {
+            clearInterval(interval);
+            resolve();
+          } else if (data.status === 'error') {
+            clearInterval(interval);
+            reject(new Error('Conversion failed'));
+          }
+        }, 1000);
+      });
+    } catch (e) {
+      alert('ERROR: ' + e.message);
       setIsDownloading(false);
       setProgress(0);
       setDownloadStatus("");
+      return;
     }
+
+    // Step 3: Trigger download by redirecting to backend directly, bypassing proxy!
+    setDownloadStatus("SAVING...");
+    // Use the proxy URL to ensure same-origin security context (fixes "not popping" issue)
+    window.location.assign(`${API_BASE}/download/${jobId}`);
+
+    setTimeout(() => {
+      setIsDownloading(false);
+      setProgress(0);
+      setDownloadStatus("");
+    }, 3000);
   };
 
   const getPlaceholder = () => {
@@ -142,52 +132,46 @@ const LightsaberInput = ({ theme, query, setQuery }) => {
     }
   };
 
-  const handleSaberClick = () => {
-    if (inputRef.current) {
-      inputRef.current.focus();
-    }
-  };
-
   return (
     <div className="search-container">
       <div
         className="input-wrapper"
-        onClick={!isFocused ? handleSaberClick : undefined}
-        style={{ cursor: !isFocused ? 'pointer' : 'default' }}
+        onClick={!isFocused && !isDownloading ? () => inputRef.current?.focus() : undefined}
+        style={{ cursor: !isFocused && !isDownloading ? 'pointer' : 'default' }}
       >
         <input
           ref={inputRef}
           type="text"
-          className={`sith-input ${isFocused ? 'visible' : 'hidden'}`}
+          className={`sith-input ${isFocused || isDownloading ? 'visible' : 'hidden'}`}
           placeholder={getPlaceholder()}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onFocus={() => setIsFocused(true)}
-          onBlur={() => setIsFocused(false)}
+          onBlur={() => { if (!isDownloading) setIsFocused(false); }}
         />
-        <div className={`lightsaber-underline ${isFocused ? 'ignited' : ''}`}>
+        <div className={`lightsaber-underline ${isFocused || isDownloading ? 'ignited' : ''}`}>
           {theme === 'sith' && <VaderHilt />}
           {theme === 'jedi' && <AnakinHilt />}
           {theme === 'yoda' && <YodaHilt />}
           {theme === 'mando' && <DarksaberHilt />}
           <div className="blade"></div>
         </div>
-        
-        <div className={`progress-wrapper ${isDownloading ? 'visible' : ''}`}>
-           <div className="progress-container">
-             <div className="progress-bar-fill" style={{ width: `${progress}%` }}></div>
-           </div>
-           {isDownloading && <div className="progress-text">{progress.toFixed(1)}%</div>}
-        </div>
 
-        <button 
-          className={`download-btn ${isFocused || isDownloading ? 'visible' : ''} ${isDownloading ? 'pulse' : ''}`}
-          onMouseDown={handleDownload}
-          disabled={isDownloading}
-        >
-          {isDownloading ? downloadStatus : "DOWNLOAD"}
-        </button>
+        <div className={`progress-wrapper ${isDownloading ? 'visible' : ''}`}>
+          <div className="progress-container">
+            <div className="progress-bar-fill" style={{ width: `${progress}%` }}></div>
+          </div>
+          {isDownloading && <div className="progress-text">{progress.toFixed(1)}%</div>}
+        </div>
       </div>
+
+      <button
+        className={`download-btn ${isFocused || isDownloading || query ? 'visible' : ''} ${isDownloading ? 'pulse' : ''}`}
+        onClick={() => handleDownload()}
+        disabled={isDownloading}
+      >
+        {isDownloading ? downloadStatus : "DOWNLOAD"}
+      </button>
     </div>
   );
 };

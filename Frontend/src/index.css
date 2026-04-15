@@ -838,3 +838,120 @@ body.mando-theme .lightsaber-underline.ignited .blade {
   letter-spacing: 2px;
   text-shadow: 0 0 5px var(--sith-red-glow);
 }
+
+.download-btn {
+  text-decoration: none;
+  display: inline-block;
+  text-align: center;
+}
+
+.download-btn.save-ready {
+  background: var(--sith-red);
+  color: #fff;
+  border-color: var(--sith-red);
+  box-shadow: 0 0 20px var(--sith-red), 0 0 40px var(--sith-red-glow);
+  text-shadow: 0 0 8px #fff;
+  animation: pulseButton 0.8s infinite alternate;
+}
+
+/* --- RESPONSIVE DESIGN --- */
+
+@media (max-width: 768px) {
+  .navbar {
+    padding: 30px 20px;
+  }
+
+  .runes-header {
+    gap: 10vw;
+    font-size: 32px;
+  }
+
+  .navbar-links {
+    gap: 20px;
+  }
+
+  .hero-title {
+    font-size: clamp(2.5rem, 10vw, 4rem);
+  }
+
+  .ambient-glow {
+    width: 80vw;
+    height: 40vh;
+  }
+}
+
+@media (max-width: 480px) {
+  .navbar {
+    padding: 20px 15px;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .navbar-links {
+    display: none; /* Hide secondary links on very small screens to focus on the experience */
+  }
+
+  .runes-header {
+    gap: 8vw;
+    font-size: 26px;
+    order: -1; /* Keep runes at top when columned */
+    margin-bottom: 10px;
+  }
+
+  .navbar-logo {
+    font-size: 22px;
+  }
+
+  .main-content {
+    padding: 20px 15px;
+  }
+
+  .hero-content {
+    width: 100%;
+  }
+
+  .hero-title {
+    font-size: clamp(2rem, 12vw, 3rem);
+    margin-bottom: 20px;
+  }
+
+  .sith-input {
+    font-size: 15px;
+    padding: 10px 5px;
+  }
+
+  .custom-hilt {
+    width: 40px !important;
+  }
+  
+  .hilt-vader, .hilt-anakin, .hilt-darksaber {
+    width: 45px !important;
+  }
+
+  .download-btn {
+    width: 100%;
+    padding: 15px 20px;
+    font-size: 14px;
+    letter-spacing: 2px;
+  }
+
+  .footer {
+    padding: 20px;
+    font-size: 10px;
+    letter-spacing: 2px;
+  }
+}
+
+/* Landscape/Short screen fix */
+@media (max-height: 500px) {
+  .navbar {
+    padding: 10px;
+  }
+  .runes-header {
+    font-size: 20px;
+    gap: 5vw;
+  }
+  .hero-title {
+    font-size: 2rem;
+  }
+}
